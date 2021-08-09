@@ -27,18 +27,26 @@ class Detector(object):
       opt.device = torch.device('cuda')
     else:
       opt.device = torch.device('cpu')
+
+    print(f"device: {opt.device}")
     
     print('Creating model...')
     self.model = create_model(
       opt.arch, opt.heads, opt.head_conv, opt=opt)
+    print('Loading model...')
     self.model = load_model(self.model, opt.load_model, opt)
+    print("Model to device")
     self.model = self.model.to(opt.device)
+    print("Model eval")
     self.model.eval()
 
     self.opt = opt
+    print("Get dataset")
     self.trained_dataset = get_dataset(opt.dataset)
+    print("Calculating mean")
     self.mean = np.array(
       self.trained_dataset.mean, dtype=np.float32).reshape(1, 1, 3)
+    print("Calculating std")
     self.std = np.array(
       self.trained_dataset.std, dtype=np.float32).reshape(1, 1, 3)
     self.pause = not opt.no_pause
@@ -48,7 +56,9 @@ class Detector(object):
     self.cnt = 0
     self.pre_images = None
     self.pre_image_ori = None
+    print("Init tracker")
     self.tracker = Tracker(opt)
+    print("Init debugger")
     self.debugger = Debugger(opt=opt, dataset=self.trained_dataset)
 
 
