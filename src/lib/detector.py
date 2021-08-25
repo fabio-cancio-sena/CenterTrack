@@ -206,7 +206,7 @@ class Detector(object):
       except:
         # print(f"CenterTrack->run: except pass")
         pass
-    print("return ret")
+    # print("return ret")
     return ret
 
 
