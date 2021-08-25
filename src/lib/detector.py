@@ -28,7 +28,7 @@ class Detector(object):
     else:
       opt.device = torch.device('cpu')
 
-    print(f"CenterTrack->__init__: device: {opt.device}")
+    # print(f"CenterTrack->__init__: device: {opt.device}")
     
     print('CenterTrack->__init__: Creating model...')
     self.model = create_model(
@@ -60,11 +60,11 @@ class Detector(object):
     self.tracker = Tracker(opt)
     print("CenterTrack->__init__: Init debugger")
     self.debugger = Debugger(opt=opt, dataset=self.trained_dataset)
-    print(f"CenterTrack->__init__: ended")
+    # print(f"CenterTrack->__init__: ended")
 
 
   def run(self, image_or_path_or_tensor, meta={}):
-    print(f"CenterTrack->run: init")
+    # print(f"CenterTrack->run: init")
     load_time, pre_time, net_time, dec_time, post_time = 0, 0, 0, 0, 0
     merge_time, track_time, tot_time, display_time = 0, 0, 0, 0
     self.debugger.clear()
@@ -73,13 +73,13 @@ class Detector(object):
     # read image
     pre_processed = False
     if isinstance(image_or_path_or_tensor, np.ndarray):
-      print(f"CenterTrack->run: image_or_path_or_tensor")
+      # print(f"CenterTrack->run: image_or_path_or_tensor")
       image = image_or_path_or_tensor
     elif type(image_or_path_or_tensor) == type (''): 
-      print(f"CenterTrack->run: cv2.imread")
+      # print(f"CenterTrack->run: cv2.imread")
       image = cv2.imread(image_or_path_or_tensor)
     else:
-      print(f"CenterTrack->run: image_or_path_or_tensor['image'][0].numpy()")
+      # print(f"CenterTrack->run: image_or_path_or_tensor['image'][0].numpy()")
       image = image_or_path_or_tensor['image'][0].numpy()
       pre_processed_images = image_or_path_or_tensor
       pre_processed = True
@@ -90,16 +90,16 @@ class Detector(object):
     detections = []
 
     # for multi-scale testing
-    print(f"CenterTrack->run: for multi-scale testing")
+    # print(f"CenterTrack->run: for multi-scale testing")
     for scale in self.opt.test_scales:
-      print(f"CenterTrack->run: inside for")
+      # print(f"CenterTrack->run: inside for")
       scale_start_time = time.time()
       if not pre_processed:
-        print(f"CenterTrack->run: not pre_processed")
+        # print(f"CenterTrack->run: not pre_processed")
         # not prefetch testing or demo
         images, meta = self.pre_process(image, scale, meta)
       else:
-        print(f"CenterTrack->run: pre_processed")
+        # print(f"CenterTrack->run: pre_processed")
         # prefetch testing
         images = pre_processed_images['images'][scale][0]
         meta = pre_processed_images['meta'][scale]
@@ -112,20 +112,20 @@ class Detector(object):
       images = images.to(self.opt.device, non_blocking=self.opt.non_block_test)
 
       # initializing tracker
-      print(f"CenterTrack->run: initializing tracker")
+      # print(f"CenterTrack->run: initializing tracker")
       pre_hms, pre_inds = None, None
       if self.opt.tracking:
-        print(f"CenterTrack->run: self.opt.tracking")
+        # print(f"CenterTrack->run: self.opt.tracking")
         # initialize the first frame
-        print(f"CenterTrack->run: initialize the first frame")
+        # print(f"CenterTrack->run: initialize the first frame")
         if self.pre_images is None:
-          print(f"CenterTrack->run: self.pre_images")
+          # print(f"CenterTrack->run: self.pre_images")
           print('Initialize tracking!')
           self.pre_images = images
           self.tracker.init_track(
             meta['pre_dets'] if 'pre_dets' in meta else [])
         if self.opt.pre_hm:
-          print(f"CenterTrack->run: self.opt.pre_hm")
+          # print(f"CenterTrack->run: self.opt.pre_hm")
           # render input heatmap from tracker status
           # pre_inds is not used in the current version.
           # We used pre_inds for learning an offset from previous image to
@@ -139,23 +139,23 @@ class Detector(object):
       # run the network
       # output: the output feature maps, only used for visualizing
       # dets: output tensors after extracting peaks
-      print(f"CenterTrack->run: self.process")
+      # print(f"CenterTrack->run: self.process")
       output, dets, forward_time = self.process(
         images, self.pre_images, pre_hms, pre_inds, return_time=True)
-      print(f"CenterTrack->run: self.process OK")
+      # print(f"CenterTrack->run: self.process OK")
       net_time += forward_time - pre_process_time
       decode_time = time.time()
       dec_time += decode_time - forward_time
       
       # convert the cropped and 4x downsampled output coordinate system
       # back to the input image coordinate system
-      print(f"CenterTrack->run: self.post_process")
+      # print(f"CenterTrack->run: self.post_process")
       result = self.post_process(dets, meta, scale)
-      print(f"CenterTrack->run: self.post_process OK")
+      # print(f"CenterTrack->run: self.post_process OK")
       post_process_time = time.time()
       post_time += post_process_time - decode_time
 
-      print(f"CenterTrack->run: detections.append(result)")
+      # print(f"CenterTrack->run: detections.append(result)")
       detections.append(result)
       if self.opt.debug >= 2:
         self.debug(
@@ -164,7 +164,7 @@ class Detector(object):
           pre_hms=pre_hms)
 
     # merge multi-scale testing results
-    print(f"CenterTrack->run: self.merge_outputs(detections)")
+    # print(f"CenterTrack->run: self.merge_outputs(detections)")
     results = self.merge_outputs(detections)
     torch.cuda.synchronize()
     end_time = time.time()
@@ -172,10 +172,10 @@ class Detector(object):
     
     if self.opt.tracking:
       # public detection mode in MOT challenge
-      print(f"CenterTrack->run: public detection mode in MOT challenge")
+      # print(f"CenterTrack->run: public detection mode in MOT challenge")
       public_det = meta['cur_dets'] if self.opt.public_det else None
       # add tracking id to results
-      print(f"CenterTrack->run: add tracking id to results")
+      # print(f"CenterTrack->run: add tracking id to results")
       results = self.tracker.step(results, public_det)
       self.pre_images = images
 
@@ -184,7 +184,7 @@ class Detector(object):
     tot_time += tracking_time - start_time
 
     if self.opt.debug >= 1:
-      print(f"CenterTrack->run: self.show_results - self.opt.debug={self.opt.debug}")
+      # print(f"CenterTrack->run: self.show_results - self.opt.debug={self.opt.debug}")
       self.show_results(self.debugger, image, results)
     self.cnt += 1
 
@@ -192,19 +192,19 @@ class Detector(object):
     display_time += show_results_time - end_time
     
     # return results and run time
-    print(f"CenterTrack->run: return results and run time")
+    # print(f"CenterTrack->run: return results and run time")
     ret = {'results': results, 'tot': tot_time, 'load': load_time,
             'pre': pre_time, 'net': net_time, 'dec': dec_time,
             'post': post_time, 'merge': merge_time, 'track': track_time,
             'display': display_time}
-    print(f"CenterTrack->run: self.opt.save_video={self.opt.save_video}")
+    # print(f"CenterTrack->run: self.opt.save_video={self.opt.save_video}")
     if self.opt.save_video:
       try:
         # return debug image for saving video
-        print(f"CenterTrack->run: return debug image for saving video")
+        # print(f"CenterTrack->run: return debug image for saving video")
         ret.update({'generic': self.debugger.imgs['generic']})
       except:
-        print(f"CenterTrack->run: except pass")
+        # print(f"CenterTrack->run: except pass")
         pass
     print("return ret")
     return ret
