@@ -77,7 +77,8 @@ def demo(opt):
       if cnt < opt.skip_first:
         continue
       
-      cv2.imshow('input', img)
+      # cv2.imshow('input', img)
+      print("cv2.imshow('input', img)")
 
       # track or detect the image.
       ret = detector.run(img)
