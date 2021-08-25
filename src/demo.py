@@ -21,6 +21,7 @@ time_stats = ['tot', 'load', 'pre', 'net', 'dec', 'post', 'merge', 'display']
 def demo(opt):
   os.environ['CUDA_VISIBLE_DEVICES'] = opt.gpus_str
   opt.debug = max(opt.debug, 1)
+  opt.debug = 0
   detector = Detector(opt)
 
   if opt.demo == 'webcam' or \
