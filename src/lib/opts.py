@@ -396,8 +396,9 @@ class opts(object):
     }
     opt = self.parse()
     from dataset.dataset_factory import dataset_factory
-    train_dataset = default_dataset_info[opt.task] \
-      if opt.task in default_dataset_info else 'coco'
+    #train_dataset = default_dataset_info[opt.task] \
+    #  if opt.task in default_dataset_info else 'coco'
+    train_dataset = opt.dataset
     dataset = dataset_factory[train_dataset]
     opt = self.update_dataset_info_and_set_heads(opt, dataset)
     return opt
