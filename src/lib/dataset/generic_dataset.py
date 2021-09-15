@@ -76,8 +76,10 @@ class GenericDataset(data.Dataset):
   def __getitem__(self, index):
     opt = self.opt
     img, anns, img_info, img_path = self._load_data(index)
-
+    print(f"img path {img_path}")
+    print(f"img path {img}")
     height, width = img.shape[0], img.shape[1]
+    
     c = np.array([img.shape[1] / 2., img.shape[0] / 2.], dtype=np.float32)
     s = max(img.shape[0], img.shape[1]) * 1.0 if not self.opt.not_max_crop \
       else np.array([img.shape[1], img.shape[0]], np.float32)
@@ -171,7 +173,9 @@ class GenericDataset(data.Dataset):
     coco = self.coco
     img_dir = self.img_dir
     img_id = self.images[index]
+    print(f"Image dir is {img_dir}")
     img, anns, img_info, img_path = self._load_image_anns(img_id, coco, img_dir)
+    print(f"img path {img_path}")
 
     return img, anns, img_info, img_path
 
