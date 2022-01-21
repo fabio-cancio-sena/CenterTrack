@@ -58,15 +58,14 @@ class GenericDataset(data.Dataset):
       self._data_rng = np.random.RandomState(123)
     
     if ann_path is not None and img_dir is not None:
-      print('==> initializing {} data from {}, \n images from {} ...'.format(
-        split, ann_path, img_dir))
+      print('==> initializing {} data from {}, \n images from {} ...'.format(split, ann_path, img_dir))
       self.coco = coco.COCO(ann_path)
       self.images = self.coco.getImgIds()
 
       if opt.tracking:
         if not ('videos' in self.coco.dataset):
           self.fake_video_data()
-        print('Creating video index!')
+        #print('Creating video index!')
         self.video_to_images = defaultdict(list)
         for image in self.coco.dataset['images']:
           self.video_to_images[image['video_id']].append(image)
@@ -76,8 +75,8 @@ class GenericDataset(data.Dataset):
   def __getitem__(self, index):
     opt = self.opt
     img, anns, img_info, img_path = self._load_data(index)
-    print(f"img path {img_path}")
-    print(f"img path {img}")
+    #print(f"img path {img_path}")
+    #print(f"img path {img}")
     height, width = img.shape[0], img.shape[1]
     
     c = np.array([img.shape[1] / 2., img.shape[0] / 2.], dtype=np.float32)
@@ -173,9 +172,9 @@ class GenericDataset(data.Dataset):
     coco = self.coco
     img_dir = self.img_dir
     img_id = self.images[index]
-    print(f"Image dir is {img_dir}")
+    #print(f"Image dir is {img_dir}")
     img, anns, img_info, img_path = self._load_image_anns(img_id, coco, img_dir)
-    print(f"img path {img_path}")
+    #print(f"img path {img_path}")
 
     return img, anns, img_info, img_path
 

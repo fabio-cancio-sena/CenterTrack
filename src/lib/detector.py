@@ -28,7 +28,7 @@ class Detector(object):
     else:
       opt.device = torch.device('cpu')
 
-    # print(f"CenterTrack->__init__: device: {opt.device}")
+    print(f"CenterTrack->__init__: device: {opt.device}")
     
     print('CenterTrack->__init__: Creating model...')
     self.model = create_model(
