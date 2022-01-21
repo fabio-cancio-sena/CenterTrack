@@ -132,6 +132,9 @@ class GenericDataset(data.Dataset):
     num_objs = min(len(anns), self.max_objs)
     for k in range(num_objs):
       ann = anns[k]
+      print(f"ann: {ann}")
+      print(f"cat_ids: {self.cat_ids}")
+      print(f"ann['category_id']: {ann['category_id']}")
       cls_id = int(self.cat_ids[ann['category_id']])
       if cls_id > self.opt.num_classes or cls_id <= -999:
         continue
